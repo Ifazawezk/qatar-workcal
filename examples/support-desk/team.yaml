@@ -1,0 +1,18 @@
+# Two-week sprints for the same made-up team.
+start: 2026-01-04
+length: 10
+count: 12
+focus: 0.8
+release_days: [sun, mon, tue, wed]
+freeze_days: 1
+members:
+  - name: Noor
+  - name: Sami
+    leave: ["2026-03-15..2026-03-26"]
+  - name: Hana
+    leave: ["2026-05-24..2026-06-04"]
+  - name: Yousef
+  - name: Maya
+    allocation: 0.5
+  - name: Karim
+    leave: ["2026-02-08..2026-02-12", "2026-05-31"]

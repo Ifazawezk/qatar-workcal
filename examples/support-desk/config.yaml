@@ -1,0 +1,16 @@
+# Office calendar for a made-up software support desk in Doha.
+weekend: [fri, sat]
+hours: ["08:00-12:00", "13:00-17:00"]
+ramadan_hours: ["09:00-12:00", "13:00-16:00"]
+sport_day: true
+holidays:
+  # Article 78 leaves three paid days to the employer.
+  - {date: 2026-04-02, name: Company day}
+# Put announced dates here once they are out, for example:
+# overrides:
+#   eid_al_adha: 2026-05-26
+sla:
+  P1: {hours: 4h, tier: 24x7}
+  P2: {hours: 8h}
+  P3: {hours: 24h}
+  P4: {hours: 40h}

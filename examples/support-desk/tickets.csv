@@ -1,0 +1,43 @@
+id,priority,opened,resolved,paused,title
+QD-1001,P3,2026-02-01 00:55,2026-02-03 11:53,,SSO redirect loop
+QD-1002,P4,2026-02-05 12:05,2026-02-11 13:58,,Password reset email not received
+QD-1003,P3,2026-02-05 15:45,2026-02-09 13:35,,User cannot change phone number
+QD-1004,P4,2026-02-10 08:25,2026-02-17 14:43,,Login page times out
+QD-1005,P3,2026-02-12 16:50,2026-02-18 15:33,,SSO redirect loop
+QD-1006,P3,2026-02-16 08:50,2026-02-19 13:03,2026-02-16 14:38/2026-02-18 14:38,Webhook retries flooding
+QD-1007,P3,2026-02-18 09:30,2026-02-24 11:54,,First day of Ramadan: rota page wrong
+QD-1008,P2,2026-02-22 16:25,2026-02-24 14:21,,Report export stuck at 99%
+QD-1009,P3,2026-02-23 02:15,2026-02-25 15:40,,API returns 500 on bulk upload
+QD-1010,P3,2026-02-25 13:10,2026-03-03 10:03,2026-02-26 10:58/2026-02-28 10:58,Webhook retries flooding
+QD-1011,P3,2026-02-26 22:10,2026-03-02 15:07,,Payment page shows blank screen
+QD-1012,P3,2026-03-01 00:20,2026-03-02 14:30,,Payment page shows blank screen
+QD-1013,P4,2026-03-13 15:30,2026-03-25 15:35,,Role permissions not saved
+QD-1014,P2,2026-03-18 02:45,2026-03-18 11:00,,Wrong timezone on audit log
+QD-1015,P2,2026-03-19 15:00,2026-03-25 15:12,,Customer portal down before Eid
+QD-1016,P1,2026-03-21 22:40,2026-03-22 01:28,,Payments failing on Eid night
+QD-1017,P2,2026-03-30 04:50,2026-03-30 11:54,,CSV import drops last row
+QD-1018,P4,2026-04-07 12:35,2026-04-09 16:57,,Role permissions not saved
+QD-1019,P1,2026-04-10 10:45,2026-04-10 12:02,,Password reset email not received
+QD-1020,P4,2026-04-10 12:15,2026-04-16 11:37,2026-04-12 17:00/2026-04-13 13:00,Password reset email not received
+QD-1021,P4,2026-04-14 14:15,2026-04-20 15:45,,Push notifications delayed
+QD-1022,P3,2026-04-15 04:05,2026-04-16 16:55,2026-04-15 13:48/2026-04-15 16:48,Mobile app crashes on Arabic search
+QD-1023,P2,2026-04-16 21:00,2026-04-20 10:01,,Password reset email not received
+QD-1024,P3,2026-04-21 01:10,2026-04-26 14:50,,User cannot change phone number
+QD-1025,P1,2026-04-23 20:30,2026-04-24 01:23,,Role permissions not saved
+QD-1026,P4,2026-04-24 10:50,2026-04-28 08:25,,Role permissions not saved
+QD-1027,P4,2026-04-25 07:30,2026-04-27 13:31,,Wrong timezone on audit log
+QD-1028,P4,2026-05-04 04:15,2026-05-11 16:52,,Dark mode text unreadable
+QD-1029,P3,2026-05-04 10:10,2026-05-07 14:16,,SSO redirect loop
+QD-1030,P3,2026-05-05 09:05,2026-05-06 08:42,2026-05-05 14:53/2026-05-05 17:53,Invoice PDF shows wrong VAT line
+QD-1031,P4,2026-05-07 05:55,2026-05-10 13:43,,Role permissions not saved
+QD-1032,P2,2026-05-07 12:10,2026-05-10 09:27,,Role permissions not saved
+QD-1033,P3,2026-05-13 11:30,2026-05-17 16:56,2026-05-14 08:18/2026-05-16 08:18,Webhook retries flooding
+QD-1034,P3,2026-05-13 21:45,2026-05-20 08:21,,Role permissions not saved
+QD-1035,P3,2026-05-18 18:30,2026-05-20 09:52,2026-05-19 13:48/2026-05-20 09:48,Report export stuck at 99%
+QD-1036,P2,2026-05-20 21:35,2026-05-24 08:08,,Dark mode text unreadable
+QD-1037,P2,2026-05-26 16:30,2026-06-01 13:18,,Release notes missing before Eid al-Adha
+QD-1038,P4,2026-05-31 08:30,,,Role permissions not saved
+QD-1039,P3,2026-06-02 10:00,,2026-06-03 09:00/,Waiting on customer logs
+QD-1040,P3,2026-06-02 16:35,,2026-06-03 13:23/2026-06-05 13:23,Role permissions not saved
+QD-1041,P2,2026-06-03 13:30,,,Slow search after release
+QD-1042,P3,2026-06-03 18:00,,,Wrong timezone on audit log
