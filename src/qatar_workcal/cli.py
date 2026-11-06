@@ -7,6 +7,8 @@ import sys
 from collections import Counter
 
 from . import __version__
+from .htmlview import page, write_page
+from .ics import Event, write_ics
 from .labour import article_73_warnings
 from .output import format_table, write_csv
 from .sla import TIERS, due, format_minutes, parse_duration
@@ -38,6 +40,13 @@ def cmd_holidays(args, cal: WorkCalendar) -> int:
     print(f"\n{DATE_NOTE}")
     if args.csv:
         write_csv(args.csv, ["date", "day", "holiday"], rows)
+    if args.ics:
+        one = dt.timedelta(days=1)
+        events = [Event(f"holiday-{h.date}", h.name, h.date, h.date + one) for h in cal.holidays(args.year)]
+        for start, end in cal.ramadan(args.year):
+            events.append(Event(f"ramadan-{start}", "Ramadan office hours", start, end + one,
+                                "Article 73: 6 hours a day, 36 a week"))
+        write_ics(args.ics, events, f"Qatar holidays {args.year}")
     return 0
 
 
@@ -89,6 +98,17 @@ def cmd_sla(args, cal: WorkCalendar) -> int:
     print(f"\n{len(results)} tickets at {_short(now)}: {summary}")
     if args.csv:
         write_csv(args.csv, SLA_HEADERS, rows)
+    if args.ics:
+        events = [
+            Event(f"sla-{r.ticket.id}", f"SLA due {r.ticket.id} ({r.policy.name})", r.due,
+                  r.due + dt.timedelta(minutes=15), f"{r.ticket.title}\nstate: {r.state}".strip())
+            for r in results if r.due is not None
+        ]
+        write_ics(args.ics, events, "SLA due times")
+    if args.html:
+        classes = [r.state.replace(" ", "-") for r in results]
+        notes = [f"{len(results)} tickets at {_short(now)}: {summary}", DATE_NOTE]
+        write_page(args.html, page("SLA clock", notes, SLA_HEADERS, rows, classes))
     return 0
 
 
@@ -115,6 +135,22 @@ def cmd_sprints(args, cal: WorkCalendar) -> int:
           f"{total:g} hours in total (focus {plan.focus:g})")
     if args.csv:
         write_csv(args.csv, SPRINT_HEADERS, rows)
+    if args.ics:
+        one = dt.timedelta(days=1)
+        events = []
+        for sp in sprints:
+            events.append(Event(f"sprint-{sp.number}-{sp.start}", f"Sprint {sp.number}", sp.start, sp.end + one,
+                                f"{len(sp.days)} working days, {sp.capacity:g} hours"))
+            if sp.release:
+                events.append(Event(f"release-{sp.number}-{sp.release}", f"Release (sprint {sp.number})",
+                                    sp.release, sp.release + one, sp.release_note))
+            events += [Event(f"holiday-{h.date}", h.name, h.date, h.date + one) for h in sp.holidays]
+        write_ics(args.ics, events, "Sprints")
+    if args.html:
+        classes = ["ramadan" if sp.ramadan_days else "" for sp in sprints]
+        notes = [f"{len(plan.members)} people, {total:g} hours across {len(sprints)} sprints. "
+                 "Shaded rows have Ramadan days.", DATE_NOTE]
+        write_page(args.html, page("Sprint plan", notes, SPRINT_HEADERS, rows, classes, bar_column=5))
     return 0
 
 
@@ -136,6 +172,7 @@ def build_parser() -> argparse.ArgumentParser:
     h = sub.add_parser("holidays", help="public holidays and Ramadan for a year")
     h.add_argument("year", type=int)
     h.add_argument("--csv")
+    h.add_argument("--ics", help="write the holidays and Ramadan as an iCalendar file")
 
     d = sub.add_parser("due", help="due time for one ticket")
     d.add_argument("opened", help='open time, e.g. "2026-03-19 15:00"')
@@ -147,10 +184,14 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("tickets")
     s.add_argument("--now", help="evaluate as of this time (default: now in Qatar)")
     s.add_argument("--csv")
+    s.add_argument("--ics", help="write each due time as an event")
+    s.add_argument("--html")
 
     sp = sub.add_parser("sprints", help="sprint dates, capacity and release days from a plan file")
     sp.add_argument("plan")
     sp.add_argument("--csv")
+    sp.add_argument("--ics", help="write sprints, release days and holidays as events")
+    sp.add_argument("--html")
 
     sub.add_parser("check", help="check office hours against Labour Law Article 73")
     return p
