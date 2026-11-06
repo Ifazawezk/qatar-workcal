@@ -68,3 +68,34 @@ def test_plan_from_dict():
         plan_from_dict({"start": "2026-01-04", "members": [{"name": "X", "allocation": 2}]})
     with pytest.raises(ValueError):
         plan_from_dict({"start": "2026-01-04", "length": 0})
+
+
+def test_release_avoids_thursday():
+    sprint = plan_sprints(CAL, Plan(D(2026, 1, 4), count=1))[0]
+    assert sprint.end == D(2026, 1, 15)  # Thursday
+    assert sprint.release == D(2026, 1, 14)
+    assert sprint.release_note == "moved from Thu 15 Jan: no releases on Thursday"
+
+
+def test_release_avoids_the_eve_of_eid():
+    # Sprint ends Tue 26 May; Eid al-Adha starts Wed 27 May.
+    sprint = plan_sprints(CAL, Plan(D(2026, 5, 13), count=1))[0]
+    assert sprint.end == D(2026, 5, 26)
+    assert sprint.release == D(2026, 5, 25)
+    assert "Eid al-Adha on Wed 27 May" in sprint.release_note
+
+
+def test_longer_freeze():
+    sprint = plan_sprints(CAL, Plan(D(2026, 5, 13), count=1, freeze_days=3))[0]
+    assert sprint.release == D(2026, 5, 20)  # Thursday 21 May is skipped too
+
+
+def test_no_safe_day():
+    from qatar_workcal.sprints import release_day
+    assert release_day(CAL, [D(2026, 1, 8)])[0] is None
+
+
+def test_release_days_from_dict():
+    plan = plan_from_dict({"start": "2026-01-04", "release_days": ["sun", "thu"], "freeze_days": 0})
+    sprint = plan_sprints(CAL, plan)[0]
+    assert sprint.release == D(2026, 1, 15) and sprint.release_note == ""

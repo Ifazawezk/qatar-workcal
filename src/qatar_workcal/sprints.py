@@ -9,7 +9,9 @@ from typing import Any
 import yaml
 
 from .holidays import Holiday
-from .workcal import WorkCalendar, parse_date
+from .workcal import WorkCalendar, parse_date, parse_weekday
+
+DEFAULT_RELEASE_DAYS = (6, 0, 1, 2)  # Sunday to Wednesday: no release right before the weekend
 
 
 @dataclass
@@ -29,6 +31,8 @@ class Plan:
     count: int = 6
     focus: float = 1.0
     members: list[Member] = field(default_factory=list)
+    release_days: tuple[int, ...] = DEFAULT_RELEASE_DAYS
+    freeze_days: int = 1
 
 
 @dataclass
@@ -39,6 +43,8 @@ class Sprint:
     by_member: dict[str, float]
     ramadan_days: int
     holidays: list[Holiday]
+    release: dt.date | None = None
+    release_note: str = ""
 
     @property
     def start(self) -> dt.date:
@@ -81,7 +87,10 @@ def plan_from_dict(data: dict[str, Any]) -> Plan:
         count=int(data.get("count", 6)),
         focus=float(data.get("focus", 1.0)),
         members=members,
+        freeze_days=int(data.get("freeze_days", 1)),
     )
+    if "release_days" in data:
+        plan.release_days = tuple(parse_weekday(d) for d in data["release_days"])
     if plan.length < 1 or plan.count < 1:
         raise ValueError("length and count must be at least 1")
     return plan
@@ -101,6 +110,34 @@ def capacity(cal: WorkCalendar, days: list[dt.date], members: list[Member], focu
     }
 
 
+def _blocker(cal: WorkCalendar, day: dt.date, release_days: tuple[int, ...], freeze_days: int) -> str:
+    """Why `day` is a bad release day, or "" if it is fine."""
+    if day.weekday() not in release_days:
+        return f"no releases on {day:%A}"
+    ahead, checked = day, 0
+    while checked < freeze_days:
+        ahead += dt.timedelta(days=1)
+        if cal.is_weekend(ahead):
+            continue
+        holiday = cal.holiday(ahead)
+        if holiday:
+            return f"{holiday.name} on {ahead:%a %d %b}"
+        checked += 1
+    return ""
+
+
+def release_day(cal: WorkCalendar, days: list[dt.date], release_days=DEFAULT_RELEASE_DAYS, freeze_days: int = 1) -> tuple[dt.date | None, str]:
+    """Latest day in the sprint that is a release weekday and leaves `freeze_days`
+    working days before the next holiday, so someone is around to fix a bad release."""
+    first_reason = _blocker(cal, days[-1], release_days, freeze_days)
+    if not first_reason:
+        return days[-1], ""
+    for day in reversed(days[:-1]):
+        if not _blocker(cal, day, release_days, freeze_days):
+            return day, f"moved from {days[-1]:%a %d %b}: {first_reason}"
+    return None, f"no safe day: {first_reason}"
+
+
 def plan_sprints(cal: WorkCalendar, plan: Plan) -> list[Sprint]:
     sprints = []
     day = cal.next_working_day(plan.start)
@@ -113,6 +150,7 @@ def plan_sprints(cal: WorkCalendar, plan: Plan) -> list[Sprint]:
             h for y in range(days[0].year, days[-1].year + 1)
             for h in cal.holidays(y) if days[0] <= h.date <= days[-1]
         ]
+        release, note = release_day(cal, days, plan.release_days, plan.freeze_days)
         sprints.append(Sprint(
             number=number,
             days=days,
@@ -120,6 +158,8 @@ def plan_sprints(cal: WorkCalendar, plan: Plan) -> list[Sprint]:
             by_member=by_member,
             ramadan_days=sum(cal.is_ramadan(d) for d in days),
             holidays=holidays,
+            release=release,
+            release_note=note,
         ))
         day = cal.next_working_day(days[-1], include=False)
     return sprints
